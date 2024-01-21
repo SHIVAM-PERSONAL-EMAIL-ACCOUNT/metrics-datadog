@@ -4,8 +4,7 @@ import java.lang.*;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.StringBuilder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,7 +82,6 @@ public class TaggedName {
     return result;
   }
 
-
   public static class TaggedNameBuilder {
     private String metricName;
     private final List<String> encodedTags = new ArrayList<String>();
@@ -115,6 +113,40 @@ public class TaggedName {
       assertNonEmpty(this.metricName, "metricName");
 
       return new TaggedName(this.metricName, this.encodedTags);
+    }
+  }
+
+  public static class SelectiveTaggedNameBuilder extends TaggedNameBuilder {
+
+    private static final String NOT_ALLOWED = "";
+
+    private final Map<String,String> allowedTags;
+
+    public SelectiveTaggedNameBuilder(Map<String,String> allowedTags) {
+      Objects.requireNonNull(allowedTags);
+      this.allowedTags = allowedTags;
+    }
+
+    @Override
+    public TaggedNameBuilder addTag(String key, String val) {
+      return allowed(key,val) ? super.addTag(key,val) : this;
+    }
+
+    private boolean allowed(String key, String val) {
+      return val.equals(allowedTags.computeIfAbsent(key, (ignore) -> NOT_ALLOWED));
+    }
+
+    @Override
+    public TaggedNameBuilder addTag(String encodedTag) {
+      return allowed(encodedTag) ? super.addTag(encodedTag) : this;
+    }
+
+    private boolean allowed(String encodedTag) {
+      return allowedTags
+              .entrySet()
+              .stream()
+              .map(e -> e.getKey() + ":" + e.getValue())
+              .anyMatch(encodedTag::equals);
     }
   }
 }
