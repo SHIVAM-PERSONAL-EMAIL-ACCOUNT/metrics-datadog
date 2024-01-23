@@ -116,17 +116,41 @@ public class TaggedName {
     }
   }
 
+  /**
+   * Specialised {@link TaggedNameBuilder} that can restrict the tags
+   * in a {@link TaggedName}. Specifically, it will only allow tags,
+   * whose key and value matches the
+   * {@link SelectiveTaggedNameBuilder#SelectiveTaggedNameBuilder(Map) configuration}.
+   */
   public static class SelectiveTaggedNameBuilder extends TaggedNameBuilder {
 
     private static final String NOT_ALLOWED = "";
 
+    /**
+     * Key-values pairs allowed as a tag.
+     */
     private final Map<String,String> allowedTags;
 
+    /**
+     * Constructs a {@link SelectiveTaggedNameBuilder} with
+     * specific tags that will be allowed.
+     * An empty Map as a parameter will be considered as
+     * nothing is allowed, dropping all the tags
+     * passed to this builder.
+     *
+     * @throws NullPointerException if allowedTags is null
+     */
     public SelectiveTaggedNameBuilder(Map<String,String> allowedTags) {
       Objects.requireNonNull(allowedTags);
       this.allowedTags = allowedTags;
     }
 
+    /**
+     * Adds a new tag to the {@code TaggedName} if it is allowed
+     * by this builder.
+     *
+     * @throws IllegalArgumentException if key is null or empty
+     */
     @Override
     public TaggedNameBuilder addTag(String key, String val) {
       assertNonEmpty(key, "key");
@@ -137,6 +161,16 @@ public class TaggedName {
       return val.equals(allowedTags.computeIfAbsent(key, (ignore) -> NOT_ALLOWED));
     }
 
+    /**
+     * Adds a new tag to the {@code TaggedName} if it is allowed
+     * by this builder. Encoded tag is expected to be colon(:) separated key-value
+     * pair of tag.
+     *
+     * @throws IllegalArgumentException if tag is null or empty
+     * @implSpec  Not much is said about use of special characters, including colon(:)
+     * in key and value of the tag in {@link TaggedNameBuilder}. Therefore, we are
+     * going to be take liberty in expecting it to be simple alphabetical string only.
+     */
     @Override
     public TaggedNameBuilder addTag(String encodedTag) {
       assertNonEmpty(encodedTag, "encodedTag");
