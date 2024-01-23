@@ -121,6 +121,22 @@ public class TaggedName {
    * in a {@link TaggedName}. Specifically, it will only allow tags,
    * whose key and value matches the
    * {@link SelectiveTaggedNameBuilder#SelectiveTaggedNameBuilder(Map) configuration}.
+   * <p>
+   * Suppose 2 tags t1 and t2, with value v1 and v2 were being passed with the metric
+   * but only tag t1 with value v1 was allowed, only tag t1 with value v1 will be
+   * considered in the final encoded metric and other tags will be dropped.
+   * <pre>{@code
+   *
+   *    metric[t1:v1]         ->      metric[t1:v1]
+   *    metric[t1:v1,t2:v2]   ->      metric[t1:v1]
+   *    metric[t2:v2]         ->      metric[]
+   *    metric[t1:v3]         ->      metric[]
+   *
+   * }</pre>
+   *
+   * @implSpec  Not much is said about use of special characters, including colon(:)
+   * in key and value of the tag in {@link TaggedNameBuilder}. Therefore, we are
+   * going to be take liberty in expecting it to be simple alphabetical string only.
    */
   public static class SelectiveTaggedNameBuilder extends TaggedNameBuilder {
 
@@ -167,9 +183,6 @@ public class TaggedName {
      * pair of tag.
      *
      * @throws IllegalArgumentException if tag is null or empty
-     * @implSpec  Not much is said about use of special characters, including colon(:)
-     * in key and value of the tag in {@link TaggedNameBuilder}. Therefore, we are
-     * going to be take liberty in expecting it to be simple alphabetical string only.
      */
     @Override
     public TaggedNameBuilder addTag(String encodedTag) {
