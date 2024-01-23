@@ -103,7 +103,7 @@ public class TaggedName {
       return this;
     }
 
-    private void assertNonEmpty(String s, String field) {
+    protected void assertNonEmpty(String s, String field) {
       if (s == null || "".equals(s.trim())) {
         throw new IllegalArgumentException((field + " must be defined"));
       }
@@ -129,6 +129,7 @@ public class TaggedName {
 
     @Override
     public TaggedNameBuilder addTag(String key, String val) {
+      assertNonEmpty(key, "key");
       return allowed(key,val) ? super.addTag(key,val) : this;
     }
 
@@ -138,6 +139,7 @@ public class TaggedName {
 
     @Override
     public TaggedNameBuilder addTag(String encodedTag) {
+      assertNonEmpty(encodedTag, "encodedTag");
       return allowed(encodedTag) ? super.addTag(encodedTag) : this;
     }
 

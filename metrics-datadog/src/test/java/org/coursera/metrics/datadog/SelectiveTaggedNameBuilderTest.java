@@ -18,6 +18,58 @@ public class SelectiveTaggedNameBuilderTest {
                 .build();
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void givenTaggedNameWithNullMetric_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .metricName(null)
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenTaggedNameWithEmptyMetric_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .metricName("")
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenTaggedNameWithNoMetric_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenTagWithNullKey_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .metricName("metric")
+                .addTag(null, "v")
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenTagWithEmptyKey_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .metricName("metric")
+                .addTag("", "v")
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenNullEncodedTag_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .metricName("metric")
+                .addTag(null)
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenEmptyEncodedTag_whenBuild_thenThrowIllegalArgumentException() {
+        new SelectiveTaggedNameBuilder(new HashMap<>())
+                .metricName("metric")
+                .addTag("")
+                .build();
+    }
+
     @Test
     public void givenEmptyAllowedTags_whenBuildWithTags_thenReturnTaggedNameWithoutTags() {
         TaggedNameBuilder builder = new SelectiveTaggedNameBuilder(new HashMap<>())
